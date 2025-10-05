@@ -1,97 +1,163 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Skybound Gatekeeper 🏛️
 
-# Getting Started
+A React Native mobile game where you help a sky guardian keep magical artifacts in the air!
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Game Description
 
-## Step 1: Start Metro
+Skybound Gatekeeper is a light arcade game where you help a sky guardian keep magical artifacts in the air. Complete up to 100 rounds, collect unique artifacts, unlock achievements and become a true legendary gatekeeper!
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Game Mechanics
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- **100 Rounds**: The game consists of up to 100 rounds, each getting progressively more difficult
+- **Time Management**: Each round starts with 5 seconds, +2 seconds added after each successful round
+- **Artifact Control**: Tap the screen to keep artifacts in the air - they fall due to gravity
+- **Progressive Difficulty**: More artifacts appear with each round, making it harder to keep them all airborne
+- **Failure Condition**: If any artifact hits the lightning ground, the round ends
 
-```sh
-# Using npm
-npm start
+## Features
 
-# OR using Yarn
-yarn start
+### 🎮 Game Screens
+- **Onboarding Screens**: 3 beautiful intro screens explaining the game
+  - Welcome screen with game logo and shield
+  - Gameplay tutorial screen with floating artifacts
+  - Collection and progress explanation screen
+- **Home Screen**: Main menu with play button and navigation
+- **Game Rules**: Detailed instructions for gameplay
+- **Gameplay Screen**: Main game area with falling artifacts
+- **Pause Screen**: Pause functionality during gameplay
+- **Game Over Screen**: End game screen with retry option
+- **Round Complete Screen**: Success screen with next round option
+
+### 📦 Collection System
+- **Artifacts**: Collect unique artifacts by completing rounds
+- **Rarity System**: Common, Rare, Epic, and Legendary artifacts
+- **Collection Screen**: View all collected artifacts
+- **Reward Popups**: Celebrate when you receive new artifacts
+
+### 🏆 Achievement System
+- **Achievements**: Unlock achievements for various milestones
+- **Progress Tracking**: Track your progress through achievements
+- **Share Feature**: Share your achievements with others
+
+### ⚙️ Settings
+- **Background Music**: Toggle background music on/off
+- **Sound Effects**: Control sound effect settings
+- **Game Description**: Learn more about the game
+
+## Technical Implementation
+
+### Architecture
+- **React Native**: Cross-platform mobile development
+- **TypeScript**: Type-safe development
+- **React Navigation**: Screen navigation and routing
+- **Context API**: Global state management for game state
+- **PanResponder**: Touch handling for gameplay mechanics
+
+### Project Structure
+```
+src/
+├── components/          # Reusable UI components
+├── contexts/           # React Context for state management
+├── screens/            # All game screens
+├── types/              # TypeScript type definitions
+└── utils/              # Utility functions
 ```
 
-## Step 2: Build and run your app
+### Key Components
+- **GameContext**: Manages game state, artifacts, achievements, and settings
+- **RewardPopup**: Reusable popup component for rewards
+- **Navigation**: Stack and tab navigation between screens
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## Installation & Setup
 
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+1. Install dependencies:
+```bash
+npm install
 ```
 
-### iOS
+2. **ВАЖНО: Добавьте ассеты (изображения и иконки)**
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+См. подробную инструкцию в файле `ASSETS_SETUP.md`
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+Необходимо добавить:
+- `assets/images/background.png` - фоновое изображение
+- `assets/icons/home.png` - иконка Home
+- `assets/icons/collection.png` - иконка Collection
+- `assets/icons/achievements.png` - иконка Achievements
+- `assets/icons/settings.png` - иконка Settings
 
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+3. For iOS:
+```bash
+cd ios && pod install && cd ..
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+4. For Android:
+```bash
+npm run android
+```
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+5. Если изображения не загружаются, очистите кеш:
+```bash
+npm start -- --reset-cache
+```
 
-## Step 3: Modify your app
+## Game Flow
 
-Now that you have successfully run the app, let's make changes!
+1. **Onboarding**: First-time users see 3 beautiful intro screens
+   - Welcome to Skybound Gatekeeper
+   - Gameplay instructions
+   - Collection and progress explanation
+2. **Start**: Launch the app and tap "PLAY" on the home screen
+3. **Rules**: Read the game rules and tap "PLAY" to start
+4. **Gameplay**: Tap the screen to keep artifacts airborne
+5. **Success**: Complete rounds to unlock artifacts and achievements
+6. **Collection**: View your collected artifacts in the collection screen
+7. **Achievements**: Check your progress in the achievements screen
+8. **Settings**: Customize your experience in the settings screen
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+## Styling & Theme
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+The game features a Greek mythology theme with:
+- **Colors**: Purple (#4B0082) and Gold (#FFD700) color scheme
+- **Background**: Sky-themed with clouds and Greek columns
+- **Typography**: Bold, uppercase text for dramatic effect
+- **Emojis**: Used for artifacts, achievements, and UI elements
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+## Asset Management
 
-## Congratulations! :tada:
+### Background Images
+- All screens use a unified background image component
+- Path: `assets/images/background.png`
+- Easily replaceable - just update one file
+- Component: `src/components/BackgroundImage.tsx`
 
-You've successfully run and modified your React Native App. :partying_face:
+### Tab Bar Icons  
+- PNG icons with tint color support
+- Path: `assets/icons/`
+- Active/inactive states automatically styled
+- Component: `src/components/TabIcon.tsx`
 
-### Now what?
+See `ASSETS_SETUP.md` for detailed instructions on adding your images.
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+## Future Enhancements
 
-# Troubleshooting
+- ✅ Unified background image system (DONE)
+- ✅ PNG icons for tab bar (DONE)
+- Implement sound effects and background music
+- Add more artifact types and achievements
+- Implement social sharing functionality
+- Add leaderboards and multiplayer features
+- Add particle effects and animations
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+## Development Notes
 
-# Learn More
+- All screens are fully responsive and work on different screen sizes
+- Game state is properly managed through React Context
+- Touch handling uses PanResponder for smooth gameplay
+- Navigation is implemented with React Navigation v6
+- TypeScript provides type safety throughout the application
 
-To learn more about React Native, take a look at the following resources:
+---
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+**Skybound Gatekeeper** - Can you become a true Gatekeeper and reach the final cup? Test your skills now! 🏛️⚡
