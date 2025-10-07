@@ -18,7 +18,8 @@ import OnboardingScreen from './src/screens/OnboardingScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import CollectionScreen from './src/screens/CollectionScreen';
 import AchievementsScreen from './src/screens/AchievementsScreen';
-import SettingsScreen from './src/screens/SettingsScreen';
+import ShopScreen from './src/screens/ShopScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 import GameRulesScreen from './src/screens/GameRulesScreen';
 import GameplayScreen from './src/screens/GameplayScreen';
 import PauseScreen from './src/screens/PauseScreen';
@@ -72,10 +73,10 @@ function MainTabs() {
         }}
       />
       <Tab.Screen 
-        name="Settings" 
-        component={SettingsScreen}
+        name="Shop" 
+        component={ShopScreen}
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon iconName="settings" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon iconName="shop" focused={focused} />,
           tabBarLabel: '',
           tabBarShowLabel: false,
         }}
@@ -103,6 +104,7 @@ function App() {
           <Stack.Screen name="Pause" component={PauseScreen} />
           <Stack.Screen name="GameOver" component={GameOverScreen} />
           <Stack.Screen name="RoundComplete" component={RoundCompleteScreen} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GameProvider>

@@ -7,16 +7,15 @@ import {
   Dimensions,
   ScrollView,
   Modal,
-  Image,
 } from 'react-native';
 import { useGame } from '../contexts/GameContext';
 import BackgroundImage from '../components/BackgroundImage';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export default function CollectionScreen() {
   const { artifacts } = useGame();
-  const [selectedArtifact, setSelectedArtifact] = useState(null);
+  const [selectedArtifact, setSelectedArtifact] = useState<any>(null);
   const [showPopup, setShowPopup] = useState(false);
 
   const handleArtifactPress = (artifact: any) => {
@@ -26,78 +25,214 @@ export default function CollectionScreen() {
     }
   };
 
-  const handleShare = () => {
-    // Share functionality would go here
-    console.log('Share artifact');
-    setShowPopup(false);
+  const getRarityColor = (rarity: string) => {
+    switch (rarity) {
+      case 'common': return '#87CEEB';
+      case 'rare': return '#9370DB';
+      case 'epic': return '#FFD700';
+      case 'legendary': return '#FF6B9D';
+      case 'mythic': return '#FF4500';
+      default: return '#87CEEB';
+    }
   };
+
+  const getRarityGlow = (rarity: string) => {
+    switch (rarity) {
+      case 'common': return 'rgba(135, 206, 235, 0.5)';
+      case 'rare': return 'rgba(147, 112, 219, 0.5)';
+      case 'epic': return 'rgba(255, 215, 0, 0.5)';
+      case 'legendary': return 'rgba(255, 107, 157, 0.5)';
+      case 'mythic': return 'rgba(255, 69, 0, 0.5)';
+      default: return 'rgba(135, 206, 235, 0.5)';
+    }
+  };
+
+  const unlockedCount = artifacts.filter(a => a.unlocked).length;
+  const totalCount = artifacts.length;
 
   return (
     <BackgroundImage style={styles.container}>
-      <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.contentContainer}>
-        {/* Title Card */}
-        <View style={styles.titleCard}>
-          <View style={styles.titleCardInner}>
-            <Text style={styles.title}>COLLECTION</Text>
+      <ScrollView 
+        style={styles.scrollContainer} 
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>ARTIFACT COLLECTION</Text>
+          <View style={styles.progressContainer}>
+            <Text style={styles.progressText}>
+              {unlockedCount} / {totalCount} COLLECTED
+            </Text>
+            <View style={styles.progressBar}>
+              <View 
+                style={[
+                  styles.progressBarFill, 
+                  { width: `${(unlockedCount / totalCount) * 100}%` }
+                ]} 
+              />
+            </View>
           </View>
         </View>
 
-        {/* Single Artifact Display */}
-        {artifacts.length > 0 && (
-          <TouchableOpacity
-            style={[
-              styles.mainArtifactCard,
-              !artifacts[0].unlocked && styles.lockedCard,
-            ]}
-            onPress={() => handleArtifactPress(artifacts[0])}
-            disabled={!artifacts[0].unlocked}
-          >
-            <View style={styles.artifactCardInner}>
-              {/* Decorative Corners */}
-              <View style={styles.cornerTopLeft} />
-              <View style={styles.cornerTopRight} />
-              <View style={styles.cornerBottomLeft} />
-              <View style={styles.cornerBottomRight} />
-
-              {/* Artifact Image */}
-              <View style={styles.artifactImageContainer}>
+        {/* Artifacts Grid */}
+        <View style={styles.artifactsGrid}>
+          {artifacts.map((artifact) => (
+            <TouchableOpacity
+              key={artifact.id}
+              style={[
+                styles.artifactCard,
+                !artifact.unlocked && styles.lockedCard,
+              ]}
+              onPress={() => handleArtifactPress(artifact)}
+              disabled={!artifact.unlocked}
+            >
+              <View 
+                style={[
+                  styles.artifactCardInner,
+                  { 
+                    borderColor: artifact.unlocked ? getRarityColor(artifact.rarity) : '#666666',
+                    shadowColor: artifact.unlocked ? getRarityGlow(artifact.rarity) : '#000000',
+                  }
+                ]}
+              >
+                {/* Artifact Icon */}
                 <Text style={[
                   styles.artifactEmoji,
-                  !artifacts[0].unlocked && styles.lockedEmoji,
+                  !artifact.unlocked && styles.lockedEmoji,
                 ]}>
-                  {artifacts[0].unlocked ? artifacts[0].emoji : '🔒'}
+                  {artifact.unlocked ? artifact.emoji : '🔒'}
+                </Text>
+
+                {/* Artifact Name */}
+                <Text style={[
+                  styles.artifactName,
+                  { color: artifact.unlocked ? getRarityColor(artifact.rarity) : '#999999' }
+                ]}>
+                  {artifact.unlocked ? artifact.name : '???'}
+                </Text>
+
+                {/* Rarity Badge */}
+                {artifact.unlocked && (
+                  <View 
+                    style={[
+                      styles.rarityBadge, 
+                      { backgroundColor: getRarityColor(artifact.rarity) }
+                    ]}
+                  >
+                    <Text style={styles.rarityText}>{artifact.rarity.toUpperCase()}</Text>
+                  </View>
+                )}
+
+                {/* Points Badge */}
+                {artifact.unlocked && (
+                  <View style={styles.pointsBadge}>
+                    <Text style={styles.pointsText}>+{artifact.pointValue}</Text>
+                  </View>
+                )}
+
+                {/* Collection Count */}
+                {artifact.unlocked && artifact.timesCollected! > 0 && (
+                  <View style={styles.collectionBadge}>
+                    <Text style={styles.collectionText}>×{artifact.timesCollected}</Text>
+                  </View>
+                )}
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Legend */}
+        <View style={styles.legend}>
+          <Text style={styles.legendTitle}>RARITY GUIDE</Text>
+          <View style={styles.legendGrid}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#87CEEB' }]} />
+              <Text style={styles.legendText}>COMMON</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#9370DB' }]} />
+              <Text style={styles.legendText}>RARE</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#FFD700' }]} />
+              <Text style={styles.legendText}>EPIC</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#FF6B9D' }]} />
+              <Text style={styles.legendText}>LEGENDARY</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: '#FF4500' }]} />
+              <Text style={styles.legendText}>MYTHIC</Text>
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+
+      {/* Artifact Detail Modal */}
+      <Modal
+        visible={showPopup}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowPopup(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <View 
+              style={[
+                styles.modalContent,
+                { borderColor: selectedArtifact ? getRarityColor(selectedArtifact.rarity) : '#FFD700' }
+              ]}
+            >
+              {/* Close Button */}
+              <TouchableOpacity 
+                style={styles.closeButton} 
+                onPress={() => setShowPopup(false)}
+              >
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+
+              {/* Artifact Details */}
+              <Text style={styles.modalEmoji}>{selectedArtifact?.emoji}</Text>
+              <Text style={[
+                styles.modalTitle,
+                { color: selectedArtifact ? getRarityColor(selectedArtifact.rarity) : '#FFD700' }
+              ]}>
+                {selectedArtifact?.name}
+              </Text>
+              
+              <View 
+                style={[
+                  styles.modalRarityBadge, 
+                  { backgroundColor: selectedArtifact ? getRarityColor(selectedArtifact.rarity) : '#FFD700' }
+                ]}
+              >
+                <Text style={styles.modalRarityText}>
+                  {selectedArtifact?.rarity.toUpperCase()}
                 </Text>
               </View>
 
-              {/* Artifact Name */}
-              <Text style={styles.artifactTitle}>
-                {artifacts[0].unlocked ? artifacts[0].name : 'CHEST'}
-              </Text>
+              <Text style={styles.modalDescription}>{selectedArtifact?.description}</Text>
 
-              {/* Round Info */}
-              <Text style={styles.roundText}>ROUND 30</Text>
-
-              {/* Description */}
-              <Text style={styles.artifactDescription}>
-                {artifacts[0].unlocked 
-                  ? artifacts[0].description 
-                  : 'AN ANCIENT CHEST OF THE TEMPLE GUARDS. INSIDE ARE HIDDEN RICHES AND FORGOTTEN SECRETS.'}
-              </Text>
-
-              {/* Status or Share Button */}
-              {artifacts[0].unlocked ? (
-                <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-                  <View style={styles.shareButtonInner}>
-                    <Text style={styles.shareButtonText}>SHARE</Text>
-                  </View>
-                </TouchableOpacity>
-              ) : (
-                <Text style={styles.unavailableText}>UNAVAILABLE</Text>
-              )}
+              <View style={styles.modalStats}>
+                <View style={styles.modalStat}>
+                  <Text style={styles.modalStatLabel}>POINT VALUE</Text>
+                  <Text style={styles.modalStatValue}>+{selectedArtifact?.pointValue}</Text>
+                </View>
+                <View style={styles.modalStat}>
+                  <Text style={styles.modalStatLabel}>COLLECTED</Text>
+                  <Text style={styles.modalStatValue}>×{selectedArtifact?.timesCollected || 0}</Text>
+                </View>
+                <View style={styles.modalStat}>
+                  <Text style={styles.modalStatLabel}>TYPE</Text>
+                  <Text style={styles.modalStatValue}>{selectedArtifact?.type.toUpperCase()}</Text>
+                </View>
+              </View>
             </View>
-          </TouchableOpacity>
-        )}
-      </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </BackgroundImage>
   );
 }
@@ -113,170 +248,232 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 140,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#380082',
+    marginBottom: 15,
+    textShadowColor: '#FFD700',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+  },
+  progressContainer: {
+    width: '100%',
     alignItems: 'center',
   },
-  // Title Card
-  titleCard: {
-    width: '100%',
-    backgroundColor: '#D4A017',
-    borderRadius: 20,
-    padding: 4,
-    marginBottom: 30,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  titleCardInner: {
-    backgroundColor: '#380082',
-    borderRadius: 16,
-    paddingVertical: 20,
-    borderWidth: 3,
-    borderColor: '#8B6914',
-  },
-  title: {
-    fontSize: 32,
+  progressText: {
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#FFFFFF',
-    textAlign: 'center',
-    letterSpacing: 2,
+    color: '#380082',
+    marginBottom: 8,
   },
-  // Main Artifact Card
-  mainArtifactCard: {
-    width: width - 80,
-    backgroundColor: '#D4A017',
-    borderRadius: 25,
-    padding: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    elevation: 12,
+  progressBar: {
+    width: '100%',
+    height: 20,
+    backgroundColor: '#380082',
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#FFD700',
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#FFD700',
+    borderRadius: 8,
+  },
+  artifactsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 30,
+  },
+  artifactCard: {
+    width: '48%',
+    marginBottom: 15,
+  },
+  lockedCard: {
+    opacity: 0.6,
   },
   artifactCardInner: {
     backgroundColor: '#380082',
-    borderRadius: 20,
-    padding: 30,
-    alignItems: 'center',
-    position: 'relative',
+    borderRadius: 15,
     borderWidth: 3,
-    borderColor: '#8B6914',
-  },
-  // Decorative Corners
-  cornerTopLeft: {
-    position: 'absolute',
-    top: 15,
-    left: 15,
-    width: 40,
-    height: 40,
-    borderTopWidth: 4,
-    borderLeftWidth: 4,
-    borderColor: '#D4A017',
-    borderTopLeftRadius: 8,
-  },
-  cornerTopRight: {
-    position: 'absolute',
-    top: 15,
-    right: 15,
-    width: 40,
-    height: 40,
-    borderTopWidth: 4,
-    borderRightWidth: 4,
-    borderColor: '#D4A017',
-    borderTopRightRadius: 8,
-  },
-  cornerBottomLeft: {
-    position: 'absolute',
-    bottom: 15,
-    left: 15,
-    width: 40,
-    height: 40,
-    borderBottomWidth: 4,
-    borderLeftWidth: 4,
-    borderColor: '#D4A017',
-    borderBottomLeftRadius: 8,
-  },
-  cornerBottomRight: {
-    position: 'absolute',
-    bottom: 15,
-    right: 15,
-    width: 40,
-    height: 40,
-    borderBottomWidth: 4,
-    borderRightWidth: 4,
-    borderColor: '#D4A017',
-    borderBottomRightRadius: 8,
-  },
-  // Artifact Content
-  artifactImageContainer: {
-    marginTop: 20,
-    marginBottom: 20,
+    padding: 15,
+    alignItems: 'center',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.6,
+    shadowRadius: 8,
+    elevation: 8,
   },
   artifactEmoji: {
-    fontSize: 120,
+    fontSize: 50,
+    marginBottom: 10,
   },
   lockedEmoji: {
-    fontSize: 100,
+    fontSize: 40,
   },
-  artifactTitle: {
-    fontSize: 28,
+  artifactName: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  rarityBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    marginBottom: 5,
+  },
+  rarityText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#380082',
+  },
+  pointsBadge: {
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  pointsText: {
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#FFFFFF',
+  },
+  collectionBadge: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: '#FF6B35',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  collectionText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  legend: {
+    backgroundColor: '#380082',
+    borderRadius: 15,
+    padding: 20,
+    borderWidth: 3,
+    borderColor: '#FFD700',
+  },
+  legendTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFD700',
+    marginBottom: 15,
     textAlign: 'center',
+  },
+  legendGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 10,
-    letterSpacing: 2,
+    marginHorizontal: 5,
   },
-  roundText: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.7)',
+  legendDot: {
+    width: 15,
+    height: 15,
+    borderRadius: 7.5,
+    marginRight: 8,
+  },
+  legendText: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: width - 60,
+    maxHeight: '80%',
+  },
+  modalContent: {
+    backgroundColor: '#380082',
+    borderRadius: 20,
+    borderWidth: 4,
+    padding: 30,
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 24,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  modalEmoji: {
+    fontSize: 80,
+    marginBottom: 15,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
     textAlign: 'center',
-    marginBottom: 20,
-    letterSpacing: 1,
   },
-  artifactDescription: {
+  modalRarityBadge: {
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 15,
+    marginBottom: 20,
+  },
+  modalRarityText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#380082',
+  },
+  modalDescription: {
     fontSize: 14,
     color: '#FFFFFF',
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: 25,
     lineHeight: 20,
-    paddingHorizontal: 10,
   },
-  // Share Button
-  shareButton: {
-    backgroundColor: '#D4A017',
-    borderRadius: 12,
-    padding: 3,
-    width: '80%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 6,
+  modalStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
   },
-  shareButtonInner: {
-    backgroundColor: '#380082',
-    borderRadius: 10,
-    paddingVertical: 15,
-    borderWidth: 2,
-    borderColor: '#8B6914',
+  modalStat: {
+    alignItems: 'center',
   },
-  shareButtonText: {
+  modalStatLabel: {
+    fontSize: 10,
+    color: 'rgba(255, 255, 255, 0.7)',
+    marginBottom: 5,
+  },
+  modalStatValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
     color: '#FFD700',
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    letterSpacing: 2,
-  },
-  unavailableText: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#FF4444',
-    textAlign: 'center',
-    letterSpacing: 2,
-  },
-  lockedCard: {
-    opacity: 0.8,
   },
 });
-

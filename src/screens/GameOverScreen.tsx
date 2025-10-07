@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -33,8 +34,12 @@ export default function GameOverScreen() {
 
   return (
     <BackgroundImage style={styles.container}>
-      {/* Main Content */}
-      <View style={styles.contentContainer}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Main Content */}
+        <View style={styles.contentContainer}>
         {/* Title */}
         <View style={styles.titleContainer}>
           <Text style={styles.title}>YOU LOST!</Text>
@@ -75,6 +80,7 @@ export default function GameOverScreen() {
           </TouchableOpacity>
         </View>
       </View>
+      </ScrollView>
     </BackgroundImage>
   );
 }
@@ -82,8 +88,13 @@ export default function GameOverScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },  contentContainer: {
-    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  contentContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
