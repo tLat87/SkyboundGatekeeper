@@ -25,6 +25,12 @@ import GameplayScreen from './src/screens/GameplayScreen';
 import PauseScreen from './src/screens/PauseScreen';
 import GameOverScreen from './src/screens/GameOverScreen';
 import RoundCompleteScreen from './src/screens/RoundCompleteScreen';
+// New screens
+import QuestsScreen from './src/screens/QuestsScreen';
+import SeasonsScreen from './src/screens/SeasonsScreen';
+import FriendsScreen from './src/screens/FriendsScreen';
+import GameModesScreen from './src/screens/GameModesScreen';
+import StatisticsScreen from './src/screens/StatisticsScreen';
 
 // Import components
 import TabIcon from './src/components/TabIcon';
@@ -105,6 +111,12 @@ function App() {
           <Stack.Screen name="GameOver" component={GameOverScreen} />
           <Stack.Screen name="RoundComplete" component={RoundCompleteScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
+          {/* New screens */}
+          <Stack.Screen name="Quests" component={QuestsScreen} />
+          <Stack.Screen name="Seasons" component={SeasonsScreen} />
+          <Stack.Screen name="Friends" component={FriendsScreen} />
+          <Stack.Screen name="GameModes" component={GameModesScreen} />
+          <Stack.Screen name="Statistics" component={StatisticsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GameProvider>

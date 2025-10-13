@@ -66,7 +66,7 @@ export default function HomeScreen() {
         {/* Main Content */}
         <View style={styles.contentContainer}>
           {/* Game Logo */}
-          <ImageBackground 
+          {/* <ImageBackground 
             source={require('../assets/img/heder/a5325ea6e5eee5bc4d418292a740c069f6c2ee69.png')} 
             style={{width: 300, height: 500}} 
           >
@@ -78,7 +78,7 @@ export default function HomeScreen() {
               source={require('../assets/img/man/HOMEIMAGE.png')} 
               style={{width: 200, height: 220, position: 'absolute', bottom: 35, alignSelf: 'center'}} 
             />
-          </ImageBackground>
+          </ImageBackground> */}
 
           {/* Play Button */}
           <TouchableOpacity style={styles.playButton} onPress={handlePlayPress}>
@@ -101,6 +101,63 @@ export default function HomeScreen() {
               <Text style={styles.statEmoji}>🔥</Text>
               <Text style={styles.statValue}>{playerProfile.longestStreak}</Text>
               <Text style={styles.statLabel}>STREAK</Text>
+            </View>
+          </View>
+
+          {/* New Features Section */}
+          <View style={styles.newFeaturesSection}>
+            <Text style={styles.newFeaturesTitle}>NEW FEATURES</Text>
+            
+            <View style={styles.featuresGrid}>
+              <TouchableOpacity 
+                style={styles.featureCard}
+                onPress={() => navigation.navigate('Quests')}
+              >
+                <Text style={styles.featureIcon}>📋</Text>
+                <Text style={styles.featureTitle}>QUESTS</Text>
+                <Text style={styles.featureDescription}>DAILY & WEEKLY CHALLENGES</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.featureCard}
+                onPress={() => navigation.navigate('Seasons')}
+              >
+                <Text style={styles.featureIcon}>🌸</Text>
+                <Text style={styles.featureTitle}>SEASONS</Text>
+                <Text style={styles.featureDescription}>LIMITED TIME REWARDS</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.featureCard}
+                onPress={() => navigation.navigate('Friends')}
+              >
+                <Text style={styles.featureIcon}>👥</Text>
+                <Text style={styles.featureTitle}>FRIENDS</Text>
+                <Text style={styles.featureDescription}>COMPETE WITH FRIENDS</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.featureCard}
+                onPress={() => navigation.navigate('GameModes')}
+              >
+                <Text style={styles.featureIcon}>🎮</Text>
+                <Text style={styles.featureTitle}>MODES</Text>
+                <Text style={styles.featureDescription}>NEW GAME MODES</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Daily Bonus */}
+          <View style={styles.dailyBonusSection}>
+            <View style={styles.dailyBonusCard}>
+              <Text style={styles.dailyBonusIcon}>🎁</Text>
+              <View style={styles.dailyBonusInfo}>
+                <Text style={styles.dailyBonusTitle}>DAILY BONUS</Text>
+                <Text style={styles.dailyBonusDescription}>CLAIM YOUR DAILY REWARDS!</Text>
+                <TouchableOpacity style={styles.claimButton}>
+                  <Text style={styles.claimButtonText}>CLAIM NOW</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
@@ -224,6 +281,105 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#FFFFFF',
     fontWeight: 'bold',
+  },
+  newFeaturesSection: {
+    marginTop: 30,
+    width: '100%',
+  },
+  newFeaturesTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#380082',
+    textAlign: 'center',
+    marginBottom: 20,
+    textShadowColor: '#FFD700',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  featuresGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 15,
+  },
+  featureCard: {
+    width: '48%',
+    backgroundColor: '#380082',
+    borderRadius: 15,
+    padding: 15,
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#FFD700',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  featureIcon: {
+    fontSize: 30,
+    marginBottom: 8,
+  },
+  featureTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#FFD700',
+    marginBottom: 5,
+    textAlign: 'center',
+  },
+  featureDescription: {
+    fontSize: 10,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    lineHeight: 14,
+  },
+  dailyBonusSection: {
+    marginTop: 30,
+    width: '100%',
+  },
+  dailyBonusCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#380082',
+    borderRadius: 15,
+    padding: 20,
+    borderWidth: 3,
+    borderColor: '#FFD700',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  dailyBonusIcon: {
+    fontSize: 40,
+    marginRight: 15,
+  },
+  dailyBonusInfo: {
+    flex: 1,
+  },
+  dailyBonusTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFD700',
+    marginBottom: 5,
+  },
+  dailyBonusDescription: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    marginBottom: 10,
+  },
+  claimButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    alignSelf: 'flex-start',
+  },
+  claimButtonText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
   },
 });
 

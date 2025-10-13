@@ -5,13 +5,20 @@ import {
   ScrollView,
   StyleSheet,
   Dimensions,
+  TouchableOpacity,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types';
 import { useGame } from '../contexts/GameContext';
 import BackgroundImage from '../components/BackgroundImage';
 
 const { width } = Dimensions.get('window');
 
+type ProfileNavigationProp = StackNavigationProp<RootStackParamList, 'Profile'>;
+
 export default function ProfileScreen() {
+  const navigation = useNavigation<ProfileNavigationProp>();
   const { playerProfile, leaderboard } = useGame();
 
   const expPercentage = (playerProfile.experience / playerProfile.expToNextLevel) * 100;
@@ -116,6 +123,14 @@ export default function ProfileScreen() {
             <Text style={styles.progressText}>{expPercentage.toFixed(0)}%</Text>
           </View>
         </View>
+
+        {/* Statistics Button */}
+        <TouchableOpacity 
+          style={styles.statisticsButton}
+          onPress={() => navigation.navigate('Statistics')}
+        >
+          <Text style={styles.statisticsButtonText}>📈 VIEW DETAILED STATISTICS</Text>
+        </TouchableOpacity>
       </ScrollView>
     </BackgroundImage>
   );
@@ -322,6 +337,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFD700',
     textAlign: 'center',
+  },
+  statisticsButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 15,
+    alignItems: 'center',
+    marginTop: 20,
+    borderWidth: 3,
+    borderColor: '#45A049',
+  },
+  statisticsButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
   },
 });
 

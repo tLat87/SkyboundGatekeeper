@@ -30,7 +30,118 @@ export interface Quest {
   rewardCoins: number;
   rewardExp: number;
   completed: boolean;
-  type: 'daily' | 'weekly' | 'special';
+  type: 'daily' | 'weekly' | 'special' | 'seasonal' | 'event';
+  category: 'collection' | 'score' | 'combo' | 'time' | 'rounds' | 'powerups';
+  difficulty: 'easy' | 'medium' | 'hard';
+  expiresAt?: Date;
+  requirements?: QuestRequirement[];
+}
+
+export interface QuestRequirement {
+  type: string;
+  value: number;
+  current: number;
+}
+
+export interface Season {
+  id: string;
+  name: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+  isActive: boolean;
+  theme: string;
+  rewards: SeasonReward[];
+  level: number;
+  experience: number;
+  maxLevel: number;
+}
+
+export interface SeasonReward {
+  id: string;
+  level: number;
+  type: 'coins' | 'powerup' | 'artifact' | 'title';
+  value: number;
+  claimed: boolean;
+  name?: string;
+  description?: string;
+}
+
+export interface Friend {
+  id: string;
+  name: string;
+  avatar: string;
+  level: number;
+  highScore: number;
+  isOnline: boolean;
+  lastSeen: Date;
+  mutualFriends: number;
+}
+
+export interface GameMode {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  difficulty: 'easy' | 'normal' | 'hard' | 'extreme';
+  timeLimit: number;
+  specialRules: string[];
+  rewards: {
+    coinsMultiplier: number;
+    expMultiplier: number;
+  };
+  unlocked: boolean;
+  requiredLevel?: number;
+}
+
+export interface Event {
+  id: string;
+  name: string;
+  description: string;
+  type: 'double_coins' | 'bonus_exp' | 'special_artifacts' | 'tournament';
+  startDate: Date;
+  endDate: Date;
+  isActive: boolean;
+  rewards: EventReward[];
+  participants: number;
+}
+
+export interface EventReward {
+  id: string;
+  name: string;
+  description: string;
+  type: 'coins' | 'powerup' | 'artifact' | 'title';
+  value: number;
+  requirement: string;
+  claimed: boolean;
+}
+
+export interface Tournament {
+  id: string;
+  name: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+  isActive: boolean;
+  participants: TournamentParticipant[];
+  rewards: TournamentReward[];
+  maxParticipants: number;
+  entryFee: number;
+}
+
+export interface TournamentParticipant {
+  id: string;
+  name: string;
+  score: number;
+  rank: number;
+  joinedAt: Date;
+}
+
+export interface TournamentReward {
+  rank: number;
+  type: 'coins' | 'powerup' | 'artifact' | 'title';
+  value: number;
+  name?: string;
 }
 
 export interface PowerUp {
@@ -55,6 +166,48 @@ export interface PlayerProfile {
   highScore: number;
   currentStreak: number;
   longestStreak: number;
+  // New fields
+  playerName: string;
+  avatar: string;
+  title: string;
+  joinDate: Date;
+  lastLogin: Date;
+  totalPlayTime: number; // in minutes
+  favoriteGameMode: string;
+  achievementsUnlocked: number;
+  questsCompleted: number;
+  friendsCount: number;
+  rank: number;
+  prestige: number;
+  seasonalLevel: number;
+  seasonalExp: number;
+  badges: Badge[];
+  statistics: PlayerStatistics;
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  unlockedAt: Date;
+  category: 'achievement' | 'seasonal' | 'event' | 'special';
+}
+
+export interface PlayerStatistics {
+  totalRoundsCompleted: number;
+  totalArtifactsCaught: number;
+  totalCursedArtifactsAvoided: number;
+  totalPowerUpsUsed: number;
+  totalComboReached: number;
+  averageScore: number;
+  bestCombo: number;
+  perfectRounds: number; // rounds without missing any artifacts
+  fastestRound: number; // in seconds
+  longestPlaySession: number; // in minutes
+  favoriteArtifact: string;
+  mostUsedPowerUp: string;
 }
 
 export interface GameState {
@@ -116,6 +269,18 @@ export type RootStackParamList = {
   RoundComplete: undefined;
   Shop: undefined;
   Profile: undefined;
+  // New screens
+  Quests: undefined;
+  Seasons: undefined;
+  Friends: undefined;
+  Leaderboard: undefined;
+  Events: undefined;
+  Tournaments: undefined;
+  GameModes: undefined;
+  Statistics: undefined;
+  Settings: undefined;
+  Badges: undefined;
+  Social: undefined;
 };
 
 export type MainTabParamList = {
@@ -123,5 +288,8 @@ export type MainTabParamList = {
   Collection: undefined;
   Achievements: undefined;
   Shop: undefined;
+  Quests: undefined;
+  Seasons: undefined;
+  Friends: undefined;
 };
 

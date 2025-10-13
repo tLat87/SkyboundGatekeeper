@@ -69,7 +69,7 @@ export default function OnboardingScreen() {
       });
     } else {
       // Navigate to main app
-      navigation.replace('Main');
+      // navigation.replace('Main');
     }
   };
 

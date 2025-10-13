@@ -36,7 +36,7 @@ interface FallingArtifact extends ArtifactPosition {
 
 export default function GameplayScreen() {
   const navigation = useNavigation<GameplayNavigationProp>();
-  const { gameState, dispatch, artifacts: collectionArtifacts, powerUps, playerProfile } = useGame();
+  const { gameState, dispatch, artifacts: collectionArtifacts, powerUps, playerProfile, gameModes } = useGame();
   const [artifacts, setArtifacts] = useState<FallingArtifact[]>([]);
   const [score, setScore] = useState(0);
   const [coins, setCoins] = useState(0);
@@ -103,7 +103,10 @@ export default function GameplayScreen() {
     setCoins(0);
     setCombo(0);
     setArtifacts([]);
-    timeRef.current = 30 + (gameState.currentRound * 5);
+    
+    // Get current game mode settings
+    const currentMode = gameModes.find(mode => mode.id === playerProfile.favoriteGameMode) || gameModes[0];
+    timeRef.current = currentMode.timeLimit || (30 + (gameState.currentRound * 5));
     nextArtifactId.current = 0;
     
     startGameLoop();
@@ -199,8 +202,10 @@ export default function GameplayScreen() {
       const totalPoints = Math.floor(finalPoints * comboMultiplier);
       setScore(prev => prev + totalPoints);
       
-      // Award coins
-      const coinsEarned = isBonus ? 5 : 2;
+      // Award coins with game mode multiplier
+      const currentMode = gameModes.find(mode => mode.id === playerProfile.favoriteGameMode) || gameModes[0];
+      const baseCoins = isBonus ? 5 : 2;
+      const coinsEarned = Math.floor(baseCoins * currentMode.rewards.coinsMultiplier);
       setCoins(prev => prev + coinsEarned);
     } else {
       resetCombo();
@@ -235,9 +240,14 @@ export default function GameplayScreen() {
     if (gameLoopRef.current) clearInterval(gameLoopRef.current);
     if (spawnTimerRef.current) clearInterval(spawnTimerRef.current);
     
-    dispatch({ type: 'END_GAME', score, coins });
-    dispatch({ type: 'ADD_COINS', amount: coins });
-    dispatch({ type: 'ADD_EXP', amount: score });
+    // Apply game mode multipliers
+    const currentMode = gameModes.find(mode => mode.id === playerProfile.favoriteGameMode) || gameModes[0];
+    const finalCoins = Math.floor(coins * currentMode.rewards.coinsMultiplier);
+    const finalExp = Math.floor(score * currentMode.rewards.expMultiplier);
+    
+    dispatch({ type: 'END_GAME', score, coins: finalCoins });
+    dispatch({ type: 'ADD_COINS', amount: finalCoins });
+    dispatch({ type: 'ADD_EXP', amount: finalExp });
     dispatch({ type: 'NEXT_ROUND' });
     
     navigation.navigate('RoundComplete');

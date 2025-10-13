@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useReducer, useState, ReactNode } from 'react';
-import { GameState, Artifact, Achievement, Settings, PowerUp, Quest, PlayerProfile, LeaderboardEntry } from '../types';
+import { 
+  GameState, Artifact, Achievement, Settings, PowerUp, Quest, PlayerProfile, LeaderboardEntry,
+  Season, Friend, GameMode, Event, Tournament, Badge, PlayerStatistics
+} from '../types';
 
 interface GameContextType {
   gameState: GameState;
@@ -10,6 +13,13 @@ interface GameContextType {
   quests: Quest[];
   playerProfile: PlayerProfile;
   leaderboard: LeaderboardEntry[];
+  // New data
+  seasons: Season[];
+  friends: Friend[];
+  gameModes: GameMode[];
+  events: Event[];
+  tournaments: Tournament[];
+  badges: Badge[];
   dispatch: React.Dispatch<GameAction>;
 }
 
@@ -32,7 +42,21 @@ type GameAction =
   | { type: 'ADD_COINS'; amount: number }
   | { type: 'ADD_EXP'; amount: number }
   | { type: 'UPDATE_QUEST_PROGRESS'; questId: string; progress: number }
-  | { type: 'SET_DIFFICULTY'; difficulty: 'easy' | 'normal' | 'hard' | 'extreme' };
+  | { type: 'SET_DIFFICULTY'; difficulty: 'easy' | 'normal' | 'hard' | 'extreme' }
+  // New actions
+  | { type: 'COMPLETE_QUEST'; questId: string }
+  | { type: 'CLAIM_SEASON_REWARD'; rewardId: string }
+  | { type: 'ADD_FRIEND'; friendId: string }
+  | { type: 'REMOVE_FRIEND'; friendId: string }
+  | { type: 'JOIN_TOURNAMENT'; tournamentId: string }
+  | { type: 'LEAVE_TOURNAMENT'; tournamentId: string }
+  | { type: 'UNLOCK_BADGE'; badgeId: string }
+  | { type: 'UPDATE_PLAYER_NAME'; name: string }
+  | { type: 'UPDATE_PLAYER_AVATAR'; avatar: string }
+  | { type: 'UPDATE_PLAYER_TITLE'; title: string }
+  | { type: 'UPDATE_STATISTICS'; stats: Partial<PlayerStatistics> }
+  | { type: 'SET_GAME_MODE'; modeId: string }
+  | { type: 'CLAIM_EVENT_REWARD'; eventId: string; rewardId: string };
 
 const initialState: GameState = {
   currentRound: 1,
@@ -309,6 +333,36 @@ const initialPlayerProfile: PlayerProfile = {
   highScore: 0,
   currentStreak: 0,
   longestStreak: 0,
+  // New fields
+  playerName: 'GUARDIAN',
+  avatar: '👑',
+  title: 'NOVICE GUARDIAN',
+  joinDate: new Date(),
+  lastLogin: new Date(),
+  totalPlayTime: 0,
+  favoriteGameMode: 'classic',
+  achievementsUnlocked: 0,
+  questsCompleted: 0,
+  friendsCount: 0,
+  rank: 1,
+  prestige: 0,
+  seasonalLevel: 1,
+  seasonalExp: 0,
+  badges: [],
+  statistics: {
+    totalRoundsCompleted: 0,
+    totalArtifactsCaught: 0,
+    totalCursedArtifactsAvoided: 0,
+    totalPowerUpsUsed: 0,
+    totalComboReached: 0,
+    averageScore: 0,
+    bestCombo: 0,
+    perfectRounds: 0,
+    fastestRound: 0,
+    longestPlaySession: 0,
+    favoriteArtifact: 'chest',
+    mostUsedPowerUp: 'slowTime',
+  },
 };
 
 const initialLeaderboard: LeaderboardEntry[] = [
@@ -341,6 +395,202 @@ const initialSettings: Settings = {
   vibration: true,
   notifications: true,
 };
+
+// New initial data
+const initialSeasons: Season[] = [
+  {
+    id: 'season_1',
+    name: 'SPRING OF MAGIC',
+    description: 'WELCOME TO THE FIRST SEASON OF SKYBOUND GATEKEEPER!',
+    startDate: new Date(),
+    endDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
+    isActive: true,
+    theme: 'spring',
+    level: 1,
+    experience: 0,
+    maxLevel: 50,
+    rewards: [
+      {
+        id: 'season_1_level_5',
+        level: 5,
+        type: 'coins',
+        value: 100,
+        claimed: false,
+        name: 'COIN BONUS',
+        description: '100 COINS FOR REACHING LEVEL 5',
+      },
+      {
+        id: 'season_1_level_10',
+        level: 10,
+        type: 'powerup',
+        value: 1,
+        claimed: false,
+        name: 'FREEZE POWER-UP',
+        description: '1 FREEZE POWER-UP',
+      },
+    ],
+  },
+];
+
+const initialFriends: Friend[] = [
+  {
+    id: 'friend_1',
+    name: 'SKY MASTER',
+    avatar: '🌟',
+    level: 25,
+    highScore: 4500,
+    isOnline: true,
+    lastSeen: new Date(),
+    mutualFriends: 3,
+  },
+  {
+    id: 'friend_2',
+    name: 'ARTIFACT HUNTER',
+    avatar: '🏹',
+    level: 18,
+    highScore: 3200,
+    isOnline: false,
+    lastSeen: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+    mutualFriends: 1,
+  },
+];
+
+const initialGameModes: GameMode[] = [
+  {
+    id: 'classic',
+    name: 'CLASSIC MODE',
+    description: 'THE ORIGINAL SKYBOUND EXPERIENCE',
+    icon: '🎮',
+    difficulty: 'normal',
+    timeLimit: 30,
+    specialRules: ['STANDARD ARTIFACTS', 'NORMAL SPEED'],
+    rewards: { coinsMultiplier: 1, expMultiplier: 1 },
+    unlocked: true,
+  },
+  {
+    id: 'speed',
+    name: 'SPEED MODE',
+    description: 'FASTER ARTIFACTS, HIGHER REWARDS',
+    icon: '⚡',
+    difficulty: 'hard',
+    timeLimit: 20,
+    specialRules: ['2X ARTIFACT SPEED', 'BONUS POINTS'],
+    rewards: { coinsMultiplier: 1.5, expMultiplier: 1.5 },
+    unlocked: false,
+    requiredLevel: 5,
+  },
+  {
+    id: 'endless',
+    name: 'ENDLESS MODE',
+    description: 'NO TIME LIMIT, SURVIVE AS LONG AS POSSIBLE',
+    icon: '♾️',
+    difficulty: 'extreme',
+    timeLimit: 0,
+    specialRules: ['NO TIME LIMIT', 'INCREASING DIFFICULTY'],
+    rewards: { coinsMultiplier: 2, expMultiplier: 2 },
+    unlocked: false,
+    requiredLevel: 10,
+  },
+  {
+    id: 'zen',
+    name: 'ZEN MODE',
+    description: 'RELAXING GAMEPLAY WITH NO CURSED ARTIFACTS',
+    icon: '🧘',
+    difficulty: 'easy',
+    timeLimit: 45,
+    specialRules: ['NO CURSED ARTIFACTS', 'SLOWER SPEED'],
+    rewards: { coinsMultiplier: 0.8, expMultiplier: 0.8 },
+    unlocked: false,
+    requiredLevel: 3,
+  },
+];
+
+const initialEvents: Event[] = [
+  {
+    id: 'event_1',
+    name: 'DOUBLE COINS WEEKEND',
+    description: 'EARN DOUBLE COINS FOR ALL GAMES!',
+    type: 'double_coins',
+    startDate: new Date(),
+    endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days
+    isActive: true,
+    participants: 1250,
+    rewards: [
+      {
+        id: 'event_1_reward_1',
+        name: 'PARTICIPATION REWARD',
+        description: '100 COINS FOR PARTICIPATING',
+        type: 'coins',
+        value: 100,
+        requirement: 'PLAY 1 GAME',
+        claimed: false,
+      },
+    ],
+  },
+];
+
+const initialTournaments: Tournament[] = [
+  {
+    id: 'tournament_1',
+    name: 'WEEKLY CHAMPIONSHIP',
+    description: 'COMPETE FOR THE WEEKLY TITLE!',
+    startDate: new Date(),
+    endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    isActive: true,
+    maxParticipants: 100,
+    entryFee: 50,
+    participants: [
+      {
+        id: 'player_1',
+        name: 'CHAMPION',
+        score: 5000,
+        rank: 1,
+        joinedAt: new Date(),
+      },
+    ],
+    rewards: [
+      {
+        rank: 1,
+        type: 'coins',
+        value: 1000,
+        name: 'CHAMPION REWARD',
+      },
+      {
+        rank: 2,
+        type: 'coins',
+        value: 500,
+        name: 'RUNNER-UP REWARD',
+      },
+      {
+        rank: 3,
+        type: 'coins',
+        value: 250,
+        name: 'THIRD PLACE REWARD',
+      },
+    ],
+  },
+];
+
+const initialBadges: Badge[] = [
+  {
+    id: 'badge_first_game',
+    name: 'FIRST STEPS',
+    description: 'COMPLETED YOUR FIRST GAME',
+    icon: '👶',
+    rarity: 'common',
+    unlockedAt: new Date(),
+    category: 'achievement',
+  },
+  {
+    id: 'badge_high_score',
+    name: 'SCORE MASTER',
+    description: 'ACHIEVED A HIGH SCORE OF 1000+',
+    icon: '🎯',
+    rarity: 'rare',
+    unlockedAt: new Date(),
+    category: 'achievement',
+  },
+];
 
 function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
@@ -405,6 +655,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [quests, setQuests] = useState<Quest[]>(initialQuests);
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile>(initialPlayerProfile);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(initialLeaderboard);
+  // New state
+  const [seasons, setSeasons] = useState<Season[]>(initialSeasons);
+  const [friends, setFriends] = useState<Friend[]>(initialFriends);
+  const [gameModes, setGameModes] = useState<GameMode[]>(initialGameModes);
+  const [events, setEvents] = useState<Event[]>(initialEvents);
+  const [tournaments, setTournaments] = useState<Tournament[]>(initialTournaments);
+  const [badges, setBadges] = useState<Badge[]>(initialBadges);
 
   const contextValue: GameContextType = {
     gameState,
@@ -415,6 +672,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
     quests,
     playerProfile,
     leaderboard,
+    seasons,
+    friends,
+    gameModes,
+    events,
+    tournaments,
+    badges,
     dispatch: (action: GameAction) => {
       dispatch(action);
       
@@ -547,8 +810,106 @@ export function GameProvider({ children }: { children: ReactNode }) {
             totalCoins: prev.totalCoins + action.coins,
             gamesPlayed: prev.gamesPlayed + 1,
             highScore: newHighScore,
+            statistics: {
+              ...prev.statistics,
+              totalRoundsCompleted: prev.statistics.totalRoundsCompleted + 1,
+              totalArtifactsCaught: prev.statistics.totalArtifactsCaught + action.score / 10, // Estimate
+              averageScore: (prev.statistics.averageScore * prev.gamesPlayed + action.score) / (prev.gamesPlayed + 1),
+            },
           };
         });
+      }
+
+      // Handle new actions
+      if (action.type === 'COMPLETE_QUEST') {
+        setQuests(prev =>
+          prev.map(quest => {
+            if (quest.id === action.questId) {
+              return { ...quest, completed: true };
+            }
+            return quest;
+          })
+        );
+        setPlayerProfile(prev => ({
+          ...prev,
+          questsCompleted: prev.questsCompleted + 1,
+        }));
+      }
+
+      if (action.type === 'CLAIM_SEASON_REWARD') {
+        setSeasons(prev =>
+          prev.map(season => ({
+            ...season,
+            rewards: season.rewards.map(reward =>
+              reward.id === action.rewardId ? { ...reward, claimed: true } : reward
+            ),
+          }))
+        );
+      }
+
+      if (action.type === 'ADD_FRIEND') {
+        setFriends(prev => [...prev, {
+          id: action.friendId,
+          name: 'NEW FRIEND',
+          avatar: '👤',
+          level: 1,
+          highScore: 0,
+          isOnline: false,
+          lastSeen: new Date(),
+          mutualFriends: 0,
+        }]);
+        setPlayerProfile(prev => ({
+          ...prev,
+          friendsCount: prev.friendsCount + 1,
+        }));
+      }
+
+      if (action.type === 'REMOVE_FRIEND') {
+        setFriends(prev => prev.filter(friend => friend.id !== action.friendId));
+        setPlayerProfile(prev => ({
+          ...prev,
+          friendsCount: Math.max(0, prev.friendsCount - 1),
+        }));
+      }
+
+      if (action.type === 'UNLOCK_BADGE') {
+        setBadges(prev => [...prev, {
+          id: action.badgeId,
+          name: 'NEW BADGE',
+          description: 'A NEW BADGE HAS BEEN UNLOCKED!',
+          icon: '🏆',
+          rarity: 'common',
+          unlockedAt: new Date(),
+          category: 'achievement',
+        }]);
+      }
+
+      if (action.type === 'UPDATE_PLAYER_NAME') {
+        setPlayerProfile(prev => ({ ...prev, playerName: action.name }));
+      }
+
+      if (action.type === 'UPDATE_PLAYER_AVATAR') {
+        setPlayerProfile(prev => ({ ...prev, avatar: action.avatar }));
+      }
+
+      if (action.type === 'UPDATE_PLAYER_TITLE') {
+        setPlayerProfile(prev => ({ ...prev, title: action.title }));
+      }
+
+      if (action.type === 'UPDATE_STATISTICS') {
+        setPlayerProfile(prev => ({
+          ...prev,
+          statistics: { ...prev.statistics, ...action.stats },
+        }));
+      }
+
+      if (action.type === 'SET_GAME_MODE') {
+        setGameModes(prev =>
+          prev.map(mode => ({
+            ...mode,
+            unlocked: mode.id === action.modeId || mode.unlocked,
+          }))
+        );
       }
     },
   };
